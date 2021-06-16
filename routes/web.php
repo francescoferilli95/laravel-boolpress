@@ -13,10 +13,23 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-});
-
+// ROUTE TO AUTHENTICATE
 Auth::routes();
 
-Route::get('/home', 'HomeController@index')->name('home');
+// ROUTE ADMIN
+Route::prefix('admin')
+    ->namespace('Admin')
+    ->middleware('auth')
+    ->name('admin')
+    ->group(function() {
+        // ROUTE HOME ADMIN
+        Route::get('/', 'HomeController@index')->name('home');
+
+        // ROUTE RESOURCE POSTS
+        Route::resource('/posts', 'PostController');
+    });
+
+// FRONT OFFICE
+Route::get('{any?}', function () {
+    return view('guest.home');
+})->where('any', '.*');
