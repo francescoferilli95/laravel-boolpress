@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Auth;
 
 /*
 |--------------------------------------------------------------------------
@@ -20,7 +21,7 @@ Auth::routes();
 Route::prefix('admin')
     ->namespace('Admin')
     ->middleware('auth')
-    ->name('admin')
+    ->name('admin.')
     ->group(function() {
         // ROUTE HOME ADMIN
         Route::get('/', 'HomeController@index')->name('home');

@@ -2,13 +2,23 @@
 
 @section('content')
     <div class="container">
-        <h1>Our Posts</h1>
 
-        <table class="table">
+        @if (session('deleted'))
+            <div class="alert alert-success">
+                <strong>{{ session('deleted') }}</strong>
+                deleted successfully.
+            </div>
+        @endif
+
+        <h1>OUR POSTS</h1>
+        <a class="btn btn-primary" href="{{ route('admin.posts.create') }}">Create a new post</a>
+
+        <table class="table mt-5">
             <thead>
                 <tr>
                     <th>ID</th>
                     <th>Title</th>
+                    <th>Category</th>
                     <th colspan="3">Actions</th>
                 </tr>
             </thead>
@@ -17,14 +27,39 @@
                     <tr>
                         <td>{{ $post->id }}</td>
                         <td>{{ $post->title }}</td>
+                        <td>@if($post->category) {{$post->category->name}} @endif</td>
                         <td>
-                            <a class="btn btn-success" href="{{ route('adminposts.show', $post->id) }}">SHOW</a>
+                            <a class="btn btn-success" 
+                            href="{{route('admin.posts.show', $post->id)}}">SHOW</a>
                         </td>
-                        <td>EDIT</td>
-                        <td>DELETE</td>
+                        <td>
+                            <a class="btn btn-warning" href="{{ route('admin.posts.edit', $post->id) }}">EDIT</a>
+                        </td>
+                        <td>
+                            <form class="delete-post-form" action="{{ route('admin.posts.destroy', $post->id) }}" method="POST">
+                                @csrf
+                                @method('DELETE')
+
+                               <input type="submit" class="btn btn-danger" value="DELETE">
+                            </form>
+                        </td>
                     </tr>
                 @endforeach
             </tbody>
         </table>
+
+        {{-- GET POSTS BY CATEGORY --}}
+        <h2>Post By Category</h2>
+        @foreach ($categories as $category)
+            <h3 class="mt-4">{{$category->name}}</h3>
+            {{-- @dump($category->posts) --}}
+            @forelse ($category->posts as $post)
+                <h4>
+                    <a href="{{ route('admin.posts.show', $post->id) }}">{{$post->title}}</a>
+                </h4>
+            @empty
+                No posts for this category. <a href="{{ route('admin.posts.create') }}">Create a new post</a>
+            @endforelse
+        @endforeach
     </div>
 @endsection
