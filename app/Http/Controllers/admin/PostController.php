@@ -8,6 +8,7 @@ use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use App\Post;
 use App\Category;
+use App\Tag;
 
 class PostController extends Controller
 {
@@ -32,8 +33,9 @@ class PostController extends Controller
     public function create()
     {
         $categories = Category::all();
+        $tags = Tag::all();
 
-        return view('admin.posts.create', compact('categories'));
+        return view('admin.posts.create', compact('categories', 'tags'));
     }
 
     /**
@@ -48,7 +50,8 @@ class PostController extends Controller
         $request->validate([
             'title' => 'required|unique:posts',
             'content' => 'required',
-            'category_id' => 'nullable|exists:categories,id'
+            'category_id' => 'nullable|exists:categories,id',
+            'tags' => 'nullable|exists:tags,id',
         ], [
             'required' => 'The :attribute is required!!',
             'unique' => 'The :attribute is already in use for another post',
@@ -56,6 +59,7 @@ class PostController extends Controller
         ]);
 
         $data = $request->all();
+        //dd($data);
 
         // gen slug
         $data['slug'] = Str::slug($data['title'], '-');
@@ -66,6 +70,11 @@ class PostController extends Controller
         $new_post->fill($data); // <<--!! FILLABLE
 
         $new_post->save();
+
+        // SALVA RELAZIONE CON TAGS IN TABELLA PIVOT
+        if(array_key_exists('tags', $data)) {
+            $new_post->tags()->attach($data['tags']);
+        }
 
         return redirect()->route('admin.posts.show', $new_post->id);
     }
@@ -96,12 +105,13 @@ class PostController extends Controller
     {
         $post = Post::find($id);
         $categories = Category::all();
+        $tags = Tag::all();
 
         if(!$post) {
             abort(404);
         }
 
-        return view('admin.posts.edit', compact('post', 'categories'));
+        return view('admin.posts.edit', compact('post', 'categories', 'tags'));
     }
 
     /**
@@ -121,7 +131,8 @@ class PostController extends Controller
                 'max:255',
             ],
             'content' => 'required',
-            'category_id' => 'nullable|exists:categories,id'
+            'category_id' => 'nullable|exists:categories,id',
+            'tags' => 'nullable|exists:tags,id',
         ], [
             'required' => 'The :attribute is required!!',
             'unique' => 'The :attribute is already in use for another post',
@@ -129,12 +140,20 @@ class PostController extends Controller
         ]);
 
         $data = $request->all();
+        //dd($data);
 
         $post = Post::find($id);
 
         // gen slug
         if($data['title'] != $post->title) {
             $data['slug'] = Str::slug($data['title'], '-');
+        }
+
+        // AGGIORNA RELAZIONE TABELLA PIVOT
+        if(array_key_exists('tags', $data)) {
+            $post->tags()->sync($data['tags']);
+        } else {
+            $post->tags()->detach();
         }
 
         $post->update($data); //<--!! FILLABLE
@@ -151,6 +170,8 @@ class PostController extends Controller
     public function destroy($id)
     {
         $post = Post::find($id);
+
+        $post->tags()->detach();
 
         $post->delete();
 
