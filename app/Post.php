@@ -12,6 +12,7 @@ class Post extends Model
         'slug',
         'category_id',
         'content',
+        'cover',
     ];
 
     public function category() {
@@ -20,5 +21,5 @@ class Post extends Model
 
     public function tags() {
         return $this->belongsToMany('App\Tag');    
-}
+    }
 }

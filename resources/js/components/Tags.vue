@@ -20,8 +20,8 @@ export default {
     
     .tag {
         display: inline-block;
-        margin: 25rem;
-        padding: 0.25rem;
+        margin: .25rem;
+        padding: .25rem;
         font-size: .75em;
         background: lightblue;
         border-radius: 20px;

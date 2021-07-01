@@ -7,12 +7,20 @@
 require('./bootstrap');
 
 window.Vue = require('vue');
+import Vue from 'vue';
+import Vuetify from 'vuetify';
+import 'vuetify/dist/vuetify.min.css'
 
 import App from './App.vue';
 import router from './routes';
 
+// register vuetify
+Vue.use(Vuetify);
+const vuetify = new Vuetify();
+
 const root = new Vue({
     el: '#root',
     router,
+    vuetify,
     render: h => h(App)
 });

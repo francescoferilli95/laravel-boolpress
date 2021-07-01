@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 use App\Post;
 use App\Category;
@@ -52,6 +53,7 @@ class PostController extends Controller
             'content' => 'required',
             'category_id' => 'nullable|exists:categories,id',
             'tags' => 'nullable|exists:tags,id',
+            'cover' => 'nullable|mimes:jpg,png,jpeg',
         ], [
             'required' => 'The :attribute is required!!',
             'unique' => 'The :attribute is already in use for another post',
@@ -60,6 +62,14 @@ class PostController extends Controller
 
         $data = $request->all();
         //dd($data);
+        
+        // gen url img
+        if(array_key_exists('cover', $data)) {
+           $img_path = Storage::put('posts-covers', $data['cover']);
+
+           // override cover file with path
+           $data['cover'] = $img_path;             
+        }
 
         // gen slug
         $data['slug'] = Str::slug($data['title'], '-');
@@ -149,6 +159,16 @@ class PostController extends Controller
             $data['slug'] = Str::slug($data['title'], '-');
         }
 
+        if(array_key_exists('cover', $data)) {
+            // delete previous cover
+            if($post->cover) {
+                Storage::delete($post->cover);
+            }
+
+            // set new cover
+            $data['cover'] = Storage::put('posts-cover', $data['cover']);
+        }
+
         // AGGIORNA RELAZIONE TABELLA PIVOT
         if(array_key_exists('tags', $data)) {
             $post->tags()->sync($data['tags']);
@@ -170,6 +190,11 @@ class PostController extends Controller
     public function destroy($id)
     {
         $post = Post::find($id);
+
+        // rimozione immagine associata eventuale
+        if($post->cover) {
+            Storage::delete($post->cover);
+        }
 
         $post->tags()->detach();
 

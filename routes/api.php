@@ -21,5 +21,10 @@ Route::namespace('Api')->group(function() {
     // GET POSTS
     Route::get('/posts', 'PostController@index');
 
+
+    // GET POST DETAIL
     Route::get('posts/{slug}', 'PostController@show');
+
+    // CONTACT FORM
+    Route::post('/contacts', 'ContactController@store');
 });

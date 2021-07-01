@@ -1,11 +1,11 @@
 <template>
-  <div>
+  <v-app>
     <Header />
 
     <main>
       <router-view></router-view>  
     </main>
-  </div>
+  </v-app>
 </template>
 
 <script>
@@ -22,6 +22,7 @@ export default {
 <style lang="scss">
 @import "../sass/frontoffice/utilities";
 body {
+/*@import '~vuetify/dist/vuetify.min.css';*/  
   font-family: sans-serif;
 }
 

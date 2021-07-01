@@ -13,7 +13,19 @@
             <a class="btn btn-warning" href="{{ route('admin.posts.edit', $post->id) }}">Edit post</a>
         </div>
 
-        <div>{{ $post->content }}</div>
+
+
+        <div class="mb-5 row">
+            @if ($post->cover)
+                <div class="col-md-6">
+                    <img class="img-fluid" src="{{asset('storage/' . $post->cover)}}" alt="{{$post->title}}">
+                </div> 
+            @endif
+
+            <div class="{{ ($post->cover == null) ? 'col' : 'col-md-6' }}">
+                {{ $post->content }}
+            </div>
+        </div>
 
         {{-- POST TAGS --}}
         {{-- @dump($post->tags) --}}

@@ -1,17 +1,19 @@
 <template>
   <div class="container">
 
-      <div v-if="post">
+    <div v-if="post">
         <h1>{{post.title}}</h1>
 
     <div class="post-info">
-        <span>{{post.category.name}}</span>
-
+        <!-- <span v-if="post.category">{{post.category.name}}</span> -->
         <Tags :tags="post.tags" />
     </div>      
 
+        <!-- AGGIUNTA COVER IMAGE -->
+        <img v-if="post.cover" :src="post.cover" :alt="post.title">
+
         <div>{{post.content}}</div>
-      </div>
+    </div>
 
     <Loader v-else />
 
